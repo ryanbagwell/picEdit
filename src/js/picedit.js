@@ -27,7 +27,8 @@
 			maxWidth: 400,					// Max width parameter
 			maxHeight: 'auto',				// Max height parameter
 			aspectRatio: true,				// Preserve aspect ratio
-            defaultImage: false             // Default image to be used with the plugin
+            defaultImage: false,            // Default image to be used with the plugin
+            constrainCrop: false            // Constrain the crop box dimensions to a square
         };
 
     // The actual plugin constructor
@@ -66,7 +67,7 @@
 				// You already have access to the DOM element and
 				// the options via the instance, e.g. this.element
 				// and this.settings
-				
+
 				// Save instance of this for inline functions
 				var _this = this;
                 // Get type of element to be used (type="file" and type="picedit" are supported)
@@ -127,8 +128,8 @@
 						_this._filename = file.name;
 					}
 					var reader = new FileReader();
-					reader.onload = function(e) { 
-						_this._create_image_with_datasrc(e.target.result, false, file); 
+					reader.onload = function(e) {
+						_this._create_image_with_datasrc(e.target.result, false, file);
 					};
 					reader.readAsDataURL(file);
 				 }
@@ -153,7 +154,7 @@
 				if (!window.Clipboard) { // Firefox
 					var pasteCatcher = $(document.createElement("div"));
 					pasteCatcher.prop("contenteditable","true").css({
-						"position" : "absolute", 
+						"position" : "absolute",
 						"left" : -999,
 						"width" : 0,
 						"height" : 0,
@@ -482,7 +483,11 @@
 			var cropframe = this._cropping.cropframe[0];
 			var evtpos = (e.clientX) ? e : e.originalEvent.touches[0];
 			cropframe.style.width = (this._cropping.w + evtpos.clientX - this._cropping.x) + 'px';
-   			cropframe.style.height = (this._cropping.h + evtpos.clientY - this._cropping.y) + 'px';
+            if (this.options.constrainCrop) {
+                cropframe.style.height = cropframe.style.width;
+            } else {
+                cropframe.style.height = (this._cropping.h + evtpos.clientY - this._cropping.y) + 'px';
+            }
 		},
 		_selection_drag_movement: function(e) {
 			var cropframe = this._cropping.cropframe[0];
@@ -651,9 +656,9 @@
 				// handle click actions on top nav buttons
 				else if($(this).hasClass("picedit_action")) {
 					$(this).parent(".picedit_element").toggleClass("active").siblings(".picedit_element").removeClass("active");
-					if($(this).parent(".picedit_element").hasClass("active")) 
+					if($(this).parent(".picedit_element").hasClass("active"))
 						$(this).closest(".picedit_nav_box").addClass("active");
-					else 
+					else
 						$(this).closest(".picedit_nav_box").removeClass("active");
 				}
 			});
